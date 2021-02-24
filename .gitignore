@@ -1,0 +1,5 @@
+*.ipynb_checkpoints
+env/
+tutorial1/
+tutorial2/
+requirements.txt

@@ -17,20 +17,32 @@ Once you are finished with this program, you should run `python preprocess.py` f
 This should load the data, perform preprocessing, and save the output to the data folder.
 
 """
-
+import re
+import pandas as pd
+import numpy as np
 def remove_percents(df, col):
-    return df
-
+    df[col] = df[col].str.rstrip("%")
+    df[col] = df[col].astype('float')
+    return df 
 def fill_zero_iron(df):
+    df['Iron (% DV)'] = df['Iron (% DV)'].fillna(0)
     return df
     
 def fix_caffeine(df):
+    df['Caffeine (mg)'] = pd.to_numeric(df['Caffeine (mg)'],errors = "coerce")
+    df['Caffeine (mg)'] = df['Caffeine (mg)'].fillna(df['Caffeine (mg)'].mean())
     return df
 
 def standardize_names(df):
+    df.columns= df.columns.str.lower()
+    df.columns = df.columns.str.replace(r"\(.*\)","")
+    df.columns = df.columns.str.rstrip()
+    print( df.columns)
     return df
 
 def fix_strings(df, col):
+    df[col] = df[col].str.replace('[^a-zA-Z ]+','',regex = True)
+    df[col] = df[col].str.lower()
     return df
 
 
@@ -44,7 +56,7 @@ def main():
     pct_DV = ['Vitamin A (% DV)', 'Vitamin C (% DV)', 'Calcium (% DV)', 'Iron (% DV)']
     for col in pct_DV:
         df = remove_percents(df, col)
-    
+   
     # the column 'Iron (% DV)' has missing values when the drink has no iron
     # complete the fill_zero_iron function to fix this
     df = fill_zero_iron(df)
@@ -66,8 +78,7 @@ def main():
     
     # now that the data is all clean, save your output to the `data` folder as 'starbucks_clean.csv'
     # you will use this file in checkpoint 2
-    
-    
+    df.to_csv(r'../data/starbucks_clean.csv')
 
 if __name__ == "__main__":
     main()
